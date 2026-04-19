@@ -12,7 +12,12 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -25,17 +30,8 @@ jobs:
       - name: Install NDK
         run: sdkmanager "ndk;25.2.9519653"
 
-      - name: Fix package.json version
-        run: |
-          node -e "
-            const fs = require('fs');
-            const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-            pkg.version = '0.0.1';
-            fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
-          "
-
       - name: Install dependencies
-        run: npm install --legacy-peer-deps
+        run: pnpm install
 
       - name: Install Tauri CLI
         run: cargo install tauri-cli --version "^2.0"
@@ -47,7 +43,7 @@ jobs:
           git checkout src-tauri/gen/android
 
       - name: Build APK
-        run: npm run android:build -- --debug --apk
+        run: pnpm android:build -- --debug --apk
         env:
           NDK_HOME: ${{ env.ANDROID_NDK_HOME }}
 
