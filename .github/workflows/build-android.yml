@@ -36,6 +36,10 @@ jobs:
       - name: Install Tauri CLI
         run: cargo install tauri-cli --version "^2.0"
 
+      - name: Update Rust dependencies
+        run: cargo update
+        working-directory: src-tauri
+
       - name: Init Android
         run: |
           rm -rf src-tauri/gen/android
