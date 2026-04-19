@@ -36,13 +36,11 @@ jobs:
       - name: Install Tauri CLI
         run: cargo install tauri-cli --version "^2.0"
 
-      - name: Fix Tauri plugin version mismatch
-        run: |
-          ls src-tauri/
-          sed -i 's/tauri-plugin-dialog = "2.6"/tauri-plugin-dialog = "2.7"/g' src-tauri/Cargo.toml
-          sed -i 's/tauri-plugin-dialog = { version = "2.6"/tauri-plugin-dialog = { version = "2.7"/g' src-tauri/Cargo.toml
-          grep plugin-dialog src-tauri/Cargo.toml
-          cd src-tauri && cargo update -p tauri-plugin-dialog
+      - name: Show Cargo.toml plugin line
+        run: grep -n "plugin-dialog" src-tauri/Cargo.toml || echo "not found"
+
+      - name: Delete Cargo.lock to force fresh resolution
+        run: rm -f src-tauri/Cargo.lock
 
       - name: Init Android
         run: |
