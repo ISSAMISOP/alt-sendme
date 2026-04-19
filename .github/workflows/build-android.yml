@@ -38,11 +38,11 @@ jobs:
 
       - name: Fix Tauri plugin version mismatch
         run: |
+          ls src-tauri/
           sed -i 's/tauri-plugin-dialog = "2.6"/tauri-plugin-dialog = "2.7"/g' src-tauri/Cargo.toml
           sed -i 's/tauri-plugin-dialog = { version = "2.6"/tauri-plugin-dialog = { version = "2.7"/g' src-tauri/Cargo.toml
-          cat src-tauri/Cargo.toml | grep plugin-dialog
-          cargo update -p tauri-plugin-dialog
-        working-directory: src-tauri
+          grep plugin-dialog src-tauri/Cargo.toml
+          cd src-tauri && cargo update -p tauri-plugin-dialog
 
       - name: Init Android
         run: |
@@ -54,7 +54,6 @@ jobs:
         run: |
           find . -name "tsconfig*.json" -not -path "*/node_modules/*" | xargs sed -i 's/"strict": true/"strict": false/g'
           find . -name "tsconfig*.json" -not -path "*/node_modules/*" | xargs sed -i 's/"skipLibCheck": false/"skipLibCheck": true/g'
-          find . -name "tsconfig*.json" -not -path "*/node_modules/*" | xargs sed -i 's/"compilerOptions": {/"compilerOptions": {\n    "skipLibCheck": true,/g'
 
       - name: Build APK
         run: pnpm android:build -- --debug --apk
