@@ -62,8 +62,12 @@ jobs:
         env:
           NDK_HOME: ${{ env.ANDROID_NDK_HOME }}
 
+      - name: Find APK location
+        run: find src-tauri/gen/android -name "*.apk" 2>/dev/null || echo "No APK found"
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: AltSendme-android
-          path: src-tauri/gen/android/app/build/outputs/apk/universal/debug/app-universal-debug.apk
+          path: src-tauri/gen/android/app/build/outputs/apk/**/*.apk
+          if-no-files-found: warn
