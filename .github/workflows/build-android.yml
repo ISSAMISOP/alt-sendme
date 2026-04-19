@@ -36,8 +36,12 @@ jobs:
       - name: Install Tauri CLI
         run: cargo install tauri-cli --version "^2.0"
 
-      - name: Update Rust dependencies
-        run: cargo update -p tauri-plugin-dialog
+      - name: Fix Tauri plugin version mismatch
+        run: |
+          sed -i 's/tauri-plugin-dialog = "2.6"/tauri-plugin-dialog = "2.7"/g' src-tauri/Cargo.toml
+          sed -i 's/tauri-plugin-dialog = { version = "2.6"/tauri-plugin-dialog = { version = "2.7"/g' src-tauri/Cargo.toml
+          cat src-tauri/Cargo.toml | grep plugin-dialog
+          cargo update -p tauri-plugin-dialog
         working-directory: src-tauri
 
       - name: Init Android
