@@ -25,6 +25,15 @@ jobs:
       - name: Install NDK
         run: sdkmanager "ndk;25.2.9519653"
 
+      - name: Fix package.json version
+        run: |
+          node -e "
+            const fs = require('fs');
+            const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+            pkg.version = '0.0.1';
+            fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
+          "
+
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
