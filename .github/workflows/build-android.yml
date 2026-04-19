@@ -1,0 +1,49 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:  # lets you trigger it manually with a button
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi,x86_64-linux-android,i686-linux-android
+
+      - name: Install Android SDK & NDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install NDK
+        run: sdkmanager "ndk;25.2.9519653"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install Tauri CLI
+        run: cargo install tauri-cli --version "^2.0"
+
+      - name: Init Android
+        run: |
+          rm -rf src-tauri/gen/android
+          cargo tauri android init
+          git checkout src-tauri/gen/android
+
+      - name: Build APK
+        run: npm run android:build -- --debug --apk
+        env:
+          NDK_HOME: ${{ env.ANDROID_NDK_HOME }}
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: AltSendme-android
+          path: src-tauri/gen/android/app/build/outputs/apk/universal/debug/app-universal-debug.apk
