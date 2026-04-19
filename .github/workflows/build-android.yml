@@ -1,7 +1,7 @@
 name: Build Android APK
 
 on:
-  workflow_dispatch:  # lets you trigger it manually with a button
+  workflow_dispatch:
 
 jobs:
   build:
@@ -12,21 +12,21 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 18
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: aarch64-linux-android,armv7-linux-androideabi,x86_64-linux-android,i686-linux-android
 
-      - name: Install Android SDK & NDK
+      - name: Install Android SDK
         uses: android-actions/setup-android@v3
 
       - name: Install NDK
         run: sdkmanager "ndk;25.2.9519653"
 
       - name: Install dependencies
-        run: npm install
+        run: npm install --legacy-peer-deps
 
       - name: Install Tauri CLI
         run: cargo install tauri-cli --version "^2.0"
