@@ -58,7 +58,7 @@ jobs:
           git checkout src-tauri/gen/android
 
       - name: Build APK
-        run: pnpm android:build -- --apk
+        run: cargo tauri android build --apk
         env:
           NDK_HOME: ${{ env.ANDROID_NDK_HOME }}
 
