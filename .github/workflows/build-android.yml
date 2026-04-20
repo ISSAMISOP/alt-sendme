@@ -56,6 +56,16 @@ jobs:
           rm -rf src-tauri/gen/android
           cargo tauri android init
 
+      - name: Add storage permissions to AndroidManifest
+        run: |
+          MANIFEST="src-tauri/gen/android/app/src/main/AndroidManifest.xml"
+          echo "Current manifest:"
+          cat $MANIFEST
+          sed -i 's/<manifest/<manifest/g' $MANIFEST
+          sed -i 's/<application/<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32"\/>\n    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29"\/>\n    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"\/>\n    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"\/>\n    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"\/>\n    <application/g' $MANIFEST
+          echo "Updated manifest:"
+          cat $MANIFEST
+
       - name: Build APK
         run: cargo tauri android build --apk --target armv7
         env:
@@ -86,7 +96,6 @@ jobs:
             --ks-key-alias debug \
             --out AltSendme-signed.apk \
             "$APK"
-          echo "Signed APK size: $(du -h AltSendme-signed.apk)"
 
       - name: Upload signed APK
         uses: actions/upload-artifact@v4
