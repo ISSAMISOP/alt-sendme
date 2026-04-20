@@ -56,17 +56,41 @@ jobs:
           rm -rf src-tauri/gen/android
           cargo tauri android init
 
-      - name: Build APK for 32-bit ARM
+      - name: Build APK
         run: cargo tauri android build --apk --target armv7
         env:
           NDK_HOME: ${{ env.ANDROID_NDK_HOME }}
 
-      - name: Find APK location
-        run: find src-tauri/gen/android -name "*.apk" 2>/dev/null || echo "No APK found"
+      - name: Generate debug keystore
+        run: |
+          keytool -genkey -v \
+            -keystore debug.keystore \
+            -alias debug \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -storepass android \
+            -keypass android \
+            -dname "CN=Debug,OU=Debug,O=Debug,L=Debug,S=Debug,C=US"
 
-      - name: Upload APK
+      - name: Sign APK with debug key
+        run: |
+          APK=$(find src-tauri/gen/android -name "*.apk" | head -1)
+          echo "Found APK: $APK"
+          APKSIGNER=$(find $ANDROID_HOME/build-tools -name "apksigner" | sort -r | head -1)
+          echo "Using apksigner: $APKSIGNER"
+          $APKSIGNER sign \
+            --ks debug.keystore \
+            --ks-pass pass:android \
+            --key-pass pass:android \
+            --ks-key-alias debug \
+            --out AltSendme-signed.apk \
+            "$APK"
+          echo "Signed APK size: $(du -h AltSendme-signed.apk)"
+
+      - name: Upload signed APK
         uses: actions/upload-artifact@v4
         with:
-          name: AltSendme-android-armv7
-          path: src-tauri/gen/android/app/build/outputs/apk/**/*.apk
+          name: AltSendme-android-signed
+          path: AltSendme-signed.apk
           if-no-files-found: warn
