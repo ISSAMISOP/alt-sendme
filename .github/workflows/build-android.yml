@@ -22,7 +22,7 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-linux-android,armv7-linux-androideabi,x86_64-linux-android,i686-linux-android
+          targets: armv7-linux-androideabi
 
       - name: Install Android SDK
         uses: android-actions/setup-android@v3
@@ -57,8 +57,8 @@ jobs:
           cargo tauri android init
           git checkout src-tauri/gen/android
 
-      - name: Build APK
-        run: cargo tauri android build --apk
+      - name: Build APK for 32-bit ARM
+        run: cargo tauri android build --apk --target armv7-linux-androideabi
         env:
           NDK_HOME: ${{ env.ANDROID_NDK_HOME }}
 
@@ -68,6 +68,6 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: AltSendme-android
+          name: AltSendme-android-armv7
           path: src-tauri/gen/android/app/build/outputs/apk/**/*.apk
           if-no-files-found: warn
