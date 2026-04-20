@@ -54,20 +54,4 @@ jobs:
       - name: Init Android
         run: |
           rm -rf src-tauri/gen/android
-          cargo tauri android init
-          git checkout src-tauri/gen/android
-
-      - name: Build APK for 32-bit ARM
-        run: cargo tauri android build --apk --target armv7-linux-androideabi
-        env:
-          NDK_HOME: ${{ env.ANDROID_NDK_HOME }}
-
-      - name: Find APK location
-        run: find src-tauri/gen/android -name "*.apk" 2>/dev/null || echo "No APK found"
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: AltSendme-android-armv7
-          path: src-tauri/gen/android/app/build/outputs/apk/**/*.apk
-          if-no-files-found: warn
+          cargo tauri a
