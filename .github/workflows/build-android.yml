@@ -59,10 +59,8 @@ jobs:
       - name: Add storage permissions to AndroidManifest
         run: |
           MANIFEST="src-tauri/gen/android/app/src/main/AndroidManifest.xml"
-          echo "Current manifest:"
-          cat $MANIFEST
-          sed -i 's/<manifest/<manifest/g' $MANIFEST
-          sed -i 's/<application/<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32"\/>\n    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29"\/>\n    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"\/>\n    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"\/>\n    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"\/>\n    <application/g' $MANIFEST
+          sed -i 's/<application/<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"\/>\n    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"\/>\n    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"\/>\n    <application/g' $MANIFEST
+          sed -i 's/android:usesCleartextTraffic/android:requestLegacyExternalStorage="true" android:usesCleartextTraffic/g' $MANIFEST
           echo "Updated manifest:"
           cat $MANIFEST
 
@@ -88,7 +86,6 @@ jobs:
           APK=$(find src-tauri/gen/android -name "*.apk" | head -1)
           echo "Found APK: $APK"
           APKSIGNER=$(find $ANDROID_HOME/build-tools -name "apksigner" | sort -r | head -1)
-          echo "Using apksigner: $APKSIGNER"
           $APKSIGNER sign \
             --ks debug.keystore \
             --ks-pass pass:android \
